@@ -64,24 +64,19 @@ resource "google_bigquery_dataset_access" "add_viewer_role" {
 }
 
 # Add authorized datasets defined for each dataset
-resource "google_bigquery_dataset_access" "authorized_datasets" {
-  for_each = {
-    for pair in flatten([
-      for ds in var.datasets : [
-        for auth_dataset in ds.authorized_datasets : {
-          dataset_id = ds.dataset
-          auth_dataset_id = auth_dataset
-        }
-      ]
-    ]) : "${pair.dataset_id}-${pair.auth_dataset_id}" => pair
-  }
+module "datasets_authorizations" {
+  source  = "terraform-google-modules/bigquery/google//modules/authorization"
+  version = "~> 6.0"
 
-  dataset_id = each.value.dataset_id
-  role       = "READER"
-  dataset {
-    project_id = var.project_id
-    dataset_id = each.value.auth_dataset_id
-  }
-  
+  count      = length(var.datasets)
+  dataset_id = var.datasets[count.index].dataset
+  project_id = var.project_id
+
+  authorized_datasets = [
+    for dataset_id in var.datasets[count.index].authorized_datasets : {
+      project_id = var.project_id
+      dataset_id = dataset_id
+    }
+  ]
   depends_on = [google_bigquery_dataset.create_datasets]
 }
