@@ -14,11 +14,6 @@ variable "google_credentials" {
   sensitive   = true
 }
 
-variable "datasets_owner" {
-  description = "Owner of the data warehouse datasets"
-  type        = string
-}
-
 variable "datasets_owner_sa_name" {
   type        = string
   description = "Service account name for datasets owner"
