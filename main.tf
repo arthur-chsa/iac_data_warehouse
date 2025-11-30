@@ -66,7 +66,7 @@ resource "google_bigquery_dataset_access" "add_viewer_role" {
 # Add authorized datasets defined for each dataset
 module "datasets_authorizations" {
   source  = "terraform-google-modules/bigquery/google//modules/authorization"
-  version = "~> 7.1"
+  version = "~> 10.0"
 
   count      = length(var.datasets)
   dataset_id = var.datasets[count.index].dataset
